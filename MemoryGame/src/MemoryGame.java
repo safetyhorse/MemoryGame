@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
@@ -49,7 +50,7 @@ class CardPanel extends JPanel implements MouseListener
 	
 	public CardPanel()
 	{
-		// add random generator to shuffle cards
+		/*// add random generator to shuffle cards
 		Random rand = new Random();
 		
 		//fill panel with the cards
@@ -58,8 +59,34 @@ class CardPanel extends JPanel implements MouseListener
 			//System.out.println("Making card");
 			int randomIndex = rand.nextInt(2)+1;
 			cards[i] = new Card(randomIndex);
-		}
+		}*/
+		
+		//it would be nicer to be able to generate this array
+		//with a loop
+		cards[0] = new Card(1, "A");
+		cards[1] = new Card(1, "a-low");
+		cards[2] = new Card(2, "B");
+		cards[3] = new Card(2, "b-low");
+		
+		shuffleCards();
 		this.addMouseListener(this);
+	}
+	
+	//shuffle cards
+	private void shuffleCards()
+	{
+		Random rand = new Random();
+		for(int i = 0; i < cards.length; i++)
+		{
+			int randomIndex = rand.nextInt(cards.length);
+			//System.out.println(randomIndex);
+			//set temporary storage for current card
+			Card temp = cards[i];
+			//set current card equal to card at random number
+			cards[i] = cards[randomIndex];
+			//set card at random number equal to temporary stored card
+			cards[randomIndex] = temp;
+		}
 	}
 	
 	@Override
@@ -116,10 +143,15 @@ class CardPanel extends JPanel implements MouseListener
 		
 		for(int i = 0; i < cards.length; i++)
 		{
-			if(cards[i].contains(e.getX(), e.getY()))
+			if(cards[i].contains(e.getX(), e.getY()) 
+					&& cards[i].isPlayable())
 			{
+				//use either strict or toggle mode
+				
+				//strict mode - card only turn face up
 				//cards[i].setFaceUp(true);
-				//toggle to opposite of if card is up or down
+				
+				//toggle mode - card turns face up or down
 				cards[i].setFaceUp(!cards[i].isFaceUp());
 				//System.out.println(cards[i].getMatchId() + " matchId");
 			}
@@ -147,13 +179,17 @@ class CardPanel extends JPanel implements MouseListener
 		//System.out.println(card2 + " card2");
 		if(numFaceUp==2)
 		{
+			//if match found identify card as matched
+			//and out of play
 			if(card1.getMatchId()==card2.getMatchId())
 			{
 				System.out.println("Match Found");
-				System.out.println(card1.getMatchId() + " card1");
-				System.out.println(card2.getMatchId() + " card2");
-				//card1.setMatched(true);
-				//card2.setMatched(true);
+				//System.out.println(card1.getMatchId() + " card1");
+				//System.out.println(card2.getMatchId() + " card2");
+				card1.setMatched(true);
+				card1.setPlayable(false);
+				card2.setMatched(true);
+				card2.setPlayable(false);
 			}
 			else
 			{
@@ -161,13 +197,23 @@ class CardPanel extends JPanel implements MouseListener
 			}
 		}
 		
-		if(numFaceUp<2)
+		/*if(numFaceUp<2)
 		{
 			System.out.println("Not enough cards flipped");
-		}
+		}*/
+		
+		//turn all cards in play face down if two cards
+		//are already face up and a third one is selected
 		if(numFaceUp>2)
 		{
 			System.out.println("Too many cards flipped");
+			for(int i = 0; i < cards.length; i++)
+			{
+				if(cards[i].isPlayable())
+				{
+					cards[i].setFaceUp(false);
+				}
+			}
 		}
 
 		repaint();
@@ -185,6 +231,9 @@ class CardPanel extends JPanel implements MouseListener
 
 class Card
 {
+	/*change opacity or background color for
+	cards that have been matched*/
+	
 	//declare private attributes
 	private Image faceUpImage;
 	private Image faceDownImage;
@@ -209,16 +258,17 @@ class Card
 		y = 0;
 	}
 	
-	public Card(int matchId)
+	public Card(int matchId, String imgName)
 	{
 		x = 0;
 		y = 0;
-		faceUpImage = new ImageIcon(matchId + ".jpg").getImage();
+		faceUpImage = new ImageIcon(imgName + ".jpg").getImage();
 		faceDownImage = new ImageIcon("back.png").getImage();
 		// show random order of cards facing up
 		// switch to isFaceUp = false later
 		isFaceUp = false;
 		isMatched = false;
+		isPlayable = true;
 		this.matchId = matchId;
 	}
 	
@@ -282,11 +332,24 @@ class Card
 		return matchId;
 	}
 
-	public boolean isMatched() {
+	public boolean isMatched() 
+	{
 		return isMatched;
 	}
 
-	public void setMatched(boolean isMatched) {
+	public void setMatched(boolean isMatched) 
+	{
 		this.isMatched = isMatched;
 	}
+	
+	public boolean isPlayable()
+	{
+		return isPlayable;
+	}
+	
+	public void setPlayable(boolean isPlayable)
+	{
+		this.isPlayable = isPlayable;
+	}
+
 }
