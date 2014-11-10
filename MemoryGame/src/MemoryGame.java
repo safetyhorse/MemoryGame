@@ -7,6 +7,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -48,11 +49,15 @@ class CardPanel extends JPanel implements MouseListener
 	
 	public CardPanel()
 	{
+		// add random generator to shuffle cards
+		Random rand = new Random();
+		
 		//fill panel with the cards
 		for(int i = 0; i < cards.length; i++)
 		{
 			//System.out.println("Making card");
-			cards[i] = new Card();
+			int randomIndex = rand.nextInt(2)+1;
+			cards[i] = new Card(randomIndex);
 		}
 		this.addMouseListener(this);
 	}
@@ -105,12 +110,64 @@ class CardPanel extends JPanel implements MouseListener
 	@Override
 	public void mousePressed(MouseEvent e)
 	{
+		int numFaceUp = 0;
+		Card card1 = null;
+		Card card2 = null;		
+		
 		for(int i = 0; i < cards.length; i++)
 		{
 			if(cards[i].contains(e.getX(), e.getY()))
 			{
-				cards[i].setFaceUp(true);
+				//cards[i].setFaceUp(true);
+				//toggle to opposite of if card is up or down
+				cards[i].setFaceUp(!cards[i].isFaceUp());
+				//System.out.println(cards[i].getMatchId() + " matchId");
 			}
+		}
+		
+		//count cards face up after the mouse is pressed
+		for(int i = 0; i < cards.length; i++)
+		{
+			if(cards[i].isFaceUp() && !cards[i].isMatched())
+			{
+				numFaceUp++;
+				if(numFaceUp==1)
+				{
+					card1 = cards[i];
+				}
+				else if(numFaceUp==2)
+				{
+					card2 = cards[i];
+				}
+			}
+			
+		}
+		System.out.println(numFaceUp + " number of cards face up");
+		//System.out.println(card1 + " card1");
+		//System.out.println(card2 + " card2");
+		if(numFaceUp==2)
+		{
+			if(card1.getMatchId()==card2.getMatchId())
+			{
+				System.out.println("Match Found");
+				System.out.println(card1.getMatchId() + " card1");
+				System.out.println(card2.getMatchId() + " card2");
+				//card1.setMatched(true);
+				//card2.setMatched(true);
+			}
+			else
+			{
+				System.out.println("No Match");
+			}
+		}
+		
+		if(numFaceUp<2)
+		{
+			System.out.println("Not enough cards flipped");
+		}
+		if(numFaceUp>2)
+		{
+			System.out.println("Too many cards flipped");
 		}
 
 		repaint();
@@ -137,6 +194,7 @@ class Card
 	private int x;
 	private int y;
 	private int matchId;
+	private boolean isMatched;
 	
 	//defaults
 	public Card()
@@ -146,8 +204,27 @@ class Card
 		isFaceUp = false;
 		isDealt = false;
 		isPlayable = false;
+		isMatched = false;
 		x = 0;
 		y = 0;
+	}
+	
+	public Card(int matchId)
+	{
+		x = 0;
+		y = 0;
+		faceUpImage = new ImageIcon(matchId + ".jpg").getImage();
+		faceDownImage = new ImageIcon("back.png").getImage();
+		// show random order of cards facing up
+		// switch to isFaceUp = false later
+		isFaceUp = false;
+		isMatched = false;
+		this.matchId = matchId;
+	}
+	
+	public void setFaceUpImage(Image faceUpImage)
+	{
+		this.faceUpImage = faceUpImage;
 	}
 	
 	public boolean isFaceUp()
@@ -198,5 +275,18 @@ class Card
 				x,y,faceUpImage.getWidth(null),
 				faceUpImage.getHeight(null));
 		return bounds.contains(new Point(px, py));
+	}
+	
+	public int getMatchId()
+	{
+		return matchId;
+	}
+
+	public boolean isMatched() {
+		return isMatched;
+	}
+
+	public void setMatched(boolean isMatched) {
+		this.isMatched = isMatched;
 	}
 }
