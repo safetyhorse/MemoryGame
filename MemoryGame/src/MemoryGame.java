@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -6,12 +7,16 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -39,9 +44,36 @@ class CardFrame extends JFrame
 {
 	public CardFrame()
 	{
-		add(new CardPanel());
+		//System.out.println("Running frame constructor");
+		CardPanel cp = new CardPanel();
+		setLayout(new BorderLayout());
+		add(cp, BorderLayout.CENTER);
+		add(new ResetPanel(cp), BorderLayout.NORTH);
 		pack();
 	}
+
+}
+
+class ResetPanel extends JPanel
+{
+	JButton resetButton = new JButton("Reset");
+	CardPanel cp;
+	
+	public ResetPanel(final CardPanel cp)
+	{
+		add(resetButton);
+		this.cp = cp;
+		resetButton.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				//System.out.println("reset clicked");
+				cp.reset();
+				
+			}
+		});
+	}
+	
 }
 
 class CardPanel extends JPanel implements MouseListener
@@ -72,6 +104,30 @@ class CardPanel extends JPanel implements MouseListener
 		this.addMouseListener(this);
 	}
 	
+	public void reset()
+	{
+		//System.out.println("now I'm here in the card panel");
+		
+		//CardPanel();
+				
+		/*cards[0] = new Card(1, "A");
+		cards[1] = new Card(1, "a-low");
+		cards[2] = new Card(2, "B");
+		cards[3] = new Card(2, "b-low");*/
+		
+		shuffleCards();
+		//reset cards
+		for(int i = 0; i < cards.length; i++)
+		{
+			cards[i].setFaceUp(false);
+			cards[i].setMatched(false);
+			cards[i].setPlayable(true);
+		}
+		repaint();
+		//this.addMouseListener(this);/**/
+		
+	}
+
 	//shuffle cards
 	private void shuffleCards()
 	{
@@ -92,6 +148,7 @@ class CardPanel extends JPanel implements MouseListener
 	@Override
 	public void paintComponent(Graphics g)
 	{
+		super.paintComponent(g);
 		Graphics2D g2D = (Graphics2D)g;
 
 		for(int i = 0; i < cards.length; i++)
@@ -139,7 +196,7 @@ class CardPanel extends JPanel implements MouseListener
 	{
 		int numFaceUp = 0;
 		Card card1 = null;
-		Card card2 = null;		
+		Card card2 = null;
 		
 		for(int i = 0; i < cards.length; i++)
 		{
