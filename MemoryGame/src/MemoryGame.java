@@ -45,10 +45,12 @@ class CardFrame extends JFrame
 	public CardFrame()
 	{
 		//System.out.println("Running frame constructor");
-		CardPanel cp = new CardPanel();
+		MessagePanel mp = new MessagePanel();
+		CardPanel cp = new CardPanel(mp);
 		setLayout(new BorderLayout());
 		add(cp, BorderLayout.CENTER);
 		add(new ResetPanel(cp), BorderLayout.NORTH);
+		add(mp, BorderLayout.SOUTH);
 		pack();
 	}
 
@@ -76,12 +78,30 @@ class ResetPanel extends JPanel
 	
 }
 
+class MessagePanel extends JPanel
+{
+	JLabel messageLabel = new JLabel();
+	
+	public MessagePanel()
+	{
+		add(messageLabel);
+		messageLabel.setText("label");
+	}
+	
+	public void setLabelText(String newText)
+	{
+		messageLabel.setText(newText);
+	}
+}
+
 class CardPanel extends JPanel implements MouseListener
 {
 	Card cards[] = new Card[4];
+	MessagePanel mp;
 	
-	public CardPanel()
+	public CardPanel(MessagePanel mp)
 	{
+		this.mp = mp;
 		/*// add random generator to shuffle cards
 		Random rand = new Random();
 		
@@ -197,6 +217,8 @@ class CardPanel extends JPanel implements MouseListener
 		int numFaceUp = 0;
 		Card card1 = null;
 		Card card2 = null;
+		
+		mp.setLabelText("new text");
 		
 		for(int i = 0; i < cards.length; i++)
 		{
