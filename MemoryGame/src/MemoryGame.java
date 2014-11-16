@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Random;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -49,7 +50,7 @@ class CardFrame extends JFrame
 		CardPanel cp = new CardPanel(mp);
 		setLayout(new BorderLayout());
 		add(cp, BorderLayout.CENTER);
-		add(new ResetPanel(cp), BorderLayout.NORTH);
+		add(new ResetPanel(cp, mp), BorderLayout.NORTH);
 		add(mp, BorderLayout.SOUTH);
 		pack();
 	}
@@ -60,17 +61,21 @@ class ResetPanel extends JPanel
 {
 	JButton resetButton = new JButton("Reset");
 	CardPanel cp;
+	MessagePanel mp;
 	
-	public ResetPanel(final CardPanel cp)
+	public ResetPanel(final CardPanel cp, final MessagePanel mp)
 	{
 		add(resetButton);
 		this.cp = cp;
+		// draw border to see panel
+		this.setBorder(BorderFactory.createLineBorder(Color.red));
 		resetButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				//System.out.println("reset clicked");
 				cp.reset();
+				mp.setLabelText(" ");
 				
 			}
 		});
@@ -86,6 +91,7 @@ class MessagePanel extends JPanel
 	{
 		add(messageLabel);
 		messageLabel.setText("label");
+		this.setBorder(BorderFactory.createLineBorder(Color.red));
 	}
 	
 	public void setLabelText(String newText)
@@ -102,6 +108,7 @@ class CardPanel extends JPanel implements MouseListener
 	public CardPanel(MessagePanel mp)
 	{
 		this.mp = mp;
+		this.setBorder(BorderFactory.createLineBorder(Color.black));
 		/*// add random generator to shuffle cards
 		Random rand = new Random();
 		
@@ -176,17 +183,17 @@ class CardPanel extends JPanel implements MouseListener
 
 			//draw the image for card[i] at x, y, width, height
 			g2D.drawImage(cards[i].displayImage(),
-					i*200,200,200,200,null);
-			//bump each additional card over by 125 px 
+					i*200,0,200,200,null);
+			//bump each additional card over by 200 px 
 			cards[i].setX(i*200);
-			cards[i].setY(200);
+			cards[i].setY(0);
 		}
 	}
 	
 	@Override
 	public Dimension getPreferredSize()
 	{
-		return new Dimension(800,800);
+		return new Dimension(800,200);
 
 	}
 
@@ -217,8 +224,9 @@ class CardPanel extends JPanel implements MouseListener
 		int numFaceUp = 0;
 		Card card1 = null;
 		Card card2 = null;
+		int numFaceDown = 0;
 		
-		mp.setLabelText("new text");
+		mp.setLabelText(" ");
 		
 		for(int i = 0; i < cards.length; i++)
 		{
@@ -253,26 +261,38 @@ class CardPanel extends JPanel implements MouseListener
 			}
 			
 		}
-		System.out.println(numFaceUp + " number of cards face up");
+		
+		//count number of cards face down after mouse is pressed
+		for(int i = 0; i < cards.length; i++)
+		{
+			if(!cards[i].isFaceUp())
+			{
+				numFaceDown++;
+			}
+		}
+		//System.out.println(numFaceUp + " number of cards face up");
 		//System.out.println(card1 + " card1");
 		//System.out.println(card2 + " card2");
+		
 		if(numFaceUp==2)
 		{
 			//if match found identify card as matched
 			//and out of play
 			if(card1.getMatchId()==card2.getMatchId())
 			{
-				System.out.println("Match Found");
+				//System.out.println("Match Found");
 				//System.out.println(card1.getMatchId() + " card1");
 				//System.out.println(card2.getMatchId() + " card2");
 				card1.setMatched(true);
 				card1.setPlayable(false);
 				card2.setMatched(true);
 				card2.setPlayable(false);
+				mp.setLabelText("Match Found");
 			}
 			else
 			{
-				System.out.println("No Match");
+				//System.out.println("No Match");
+				mp.setLabelText("No Match");
 			}
 		}
 		
@@ -293,6 +313,13 @@ class CardPanel extends JPanel implements MouseListener
 					cards[i].setFaceUp(false);
 				}
 			}
+		}
+		
+		// if all the cards are face up, you win
+		System.out.println(numFaceDown);
+		if(numFaceDown == 0)
+		{
+			mp.setLabelText("Winner Winner Chicken Dinner!");
 		}
 
 		repaint();
