@@ -101,7 +101,7 @@ class ResetPanel extends JPanel
 			{
 				//System.out.println("reset clicked");
 				cp.reset();
-				mp.setLabelText(" ");
+				mp.setLabelText("Who's Poo Game");
 				
 			}
 		});
@@ -257,10 +257,10 @@ class CardPanel extends JPanel implements MouseListener
 			{
 				//draw the image for card[i] at x, y, width, height
 				g2D.drawImage(cards[row][col].displayImage(),
-						col*200,row*200,200,200,null);
+						col*150,row*150,150,150,null);
 				//bump each additional card over by 200 px 
-				cards[row][col].setX(col*200);
-				cards[row][col].setY(row*200);
+				cards[row][col].setX(col*150);
+				cards[row][col].setY(row*150);
 			}
 
 			
@@ -270,7 +270,7 @@ class CardPanel extends JPanel implements MouseListener
 	@Override
 	public Dimension getPreferredSize()
 	{
-		return new Dimension(800,800);
+		return new Dimension(600,600);
 
 	}
 
