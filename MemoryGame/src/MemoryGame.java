@@ -2,6 +2,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -11,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
@@ -19,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 
 public class MemoryGame
@@ -31,7 +35,7 @@ public class MemoryGame
 			public void run()
 			{
 				JFrame frame = new CardFrame();
-               frame.setTitle("Memory Card Game");
+               frame.setTitle("Who's Poo? Game");
                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                frame.setVisible(true);
 			}
@@ -50,8 +54,8 @@ class CardFrame extends JFrame
 		CardPanel cp = new CardPanel(mp);
 		setLayout(new BorderLayout());
 		add(cp, BorderLayout.CENTER);
-		add(new ResetPanel(cp, mp), BorderLayout.NORTH);
-		add(mp, BorderLayout.SOUTH);
+		add(new ResetPanel(cp, mp), BorderLayout.SOUTH);
+		add(mp, BorderLayout.NORTH);
 		pack();
 	}
 
@@ -68,7 +72,29 @@ class ResetPanel extends JPanel
 		add(resetButton);
 		this.cp = cp;
 		// draw border to see panel
-		this.setBorder(BorderFactory.createLineBorder(Color.red));
+		//this.setBorder(BorderFactory.createLineBorder(Color.red));
+		this.setBackground(Color.WHITE);
+		resetButton.setBackground(Color.WHITE);
+		//resetButton.setBorder(null);
+		//resetButton.setBorderPainted(false);
+		resetButton.setFocusPainted(false);
+		//Border paddingBorder = BorderFactory.createEmptyBorder(0,10,0,10);
+		//resetButton.setBorder(paddingBorder);
+		try
+		{
+			File f = new File("Champagne & Limousines Bold Italic.ttf");
+			FileInputStream in = new FileInputStream(f);
+			Font dynamicFont = Font.createFont(Font.TRUETYPE_FONT,
+					in);
+			Font dynamicFont28Pt = dynamicFont.deriveFont(28f);
+			resetButton.setFont(dynamicFont28Pt);
+
+		}
+		catch(Exception e)
+		{
+			System.out.println("Loading Font Didn't Work");
+		}
+		
 		resetButton.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -90,25 +116,51 @@ class MessagePanel extends JPanel
 	public MessagePanel()
 	{
 		add(messageLabel);
-		messageLabel.setText("label");
-		this.setBorder(BorderFactory.createLineBorder(Color.red));
+		messageLabel.setText("Who's Poo Game");
+		//this.setBorder(BorderFactory.createLineBorder(Color.red));
+		this.setBackground(Color.WHITE);
+		Border paddingBorder = BorderFactory.createEmptyBorder(0,10,0,10);
+		messageLabel.setBorder(paddingBorder);
+		try
+		{
+			File f = new File("Champagne & Limousines Bold Italic.ttf");
+			FileInputStream in = new FileInputStream(f);
+			Font dynamicFont = Font.createFont(Font.TRUETYPE_FONT,
+					in);
+			Font dynamicFont28Pt = dynamicFont.deriveFont(28f);
+			messageLabel.setFont(dynamicFont28Pt);
+
+		}
+		catch(Exception e)
+		{
+			System.out.println("Loading Font Didn't Work");
+		}
+		
 	}
 	
 	public void setLabelText(String newText)
 	{
 		messageLabel.setText(newText);
 	}
+	
+	/*@Override
+	public Dimension getPreferredSize()
+	{
+		return new Dimension(800,100);
+
+	}*/
 }
 
 class CardPanel extends JPanel implements MouseListener
 {
-	Card cards[] = new Card[4];
+	Card cards[][] = new Card[4][4];
 	MessagePanel mp;
 	
 	public CardPanel(MessagePanel mp)
 	{
 		this.mp = mp;
-		this.setBorder(BorderFactory.createLineBorder(Color.black));
+		//this.setBorder(BorderFactory.createLineBorder(Color.black));
+		this.setBackground(Color.WHITE);
 		/*// add random generator to shuffle cards
 		Random rand = new Random();
 		
@@ -122,10 +174,22 @@ class CardPanel extends JPanel implements MouseListener
 		
 		//it would be nicer to be able to generate this array
 		//with a loop
-		cards[0] = new Card(1, "A");
-		cards[1] = new Card(1, "a-low");
-		cards[2] = new Card(2, "B");
-		cards[3] = new Card(2, "b-low");
+		cards[0][0] = new Card(1, "bear");
+		cards[0][1] = new Card(1, "bear2");
+		cards[0][2] = new Card(2, "bison");
+		cards[0][3] = new Card(2, "bison2");
+		cards[1][0] = new Card(3, "deer");
+		cards[1][1] = new Card(3, "deer2");
+		cards[1][2] = new Card(4, "dog");
+		cards[1][3] = new Card(4, "dog2");
+		cards[2][0] = new Card(5, "elephant");
+		cards[2][1] = new Card(5, "elephant2");
+		cards[2][2] = new Card(6, "horse");
+		cards[2][3] = new Card(6, "horse2");
+		cards[3][0] = new Card(7, "lion");
+		cards[3][1] = new Card(7, "lion2");
+		cards[3][2] = new Card(8, "mouse");
+		cards[3][3] = new Card(8, "mouse2");
 		
 		shuffleCards();
 		this.addMouseListener(this);
@@ -146,9 +210,13 @@ class CardPanel extends JPanel implements MouseListener
 		//reset cards
 		for(int i = 0; i < cards.length; i++)
 		{
-			cards[i].setFaceUp(false);
-			cards[i].setMatched(false);
-			cards[i].setPlayable(true);
+			for(int j = 0; j < cards.length; j++)
+			{
+				cards[j][i].setFaceUp(false);
+				cards[j][i].setMatched(false);
+				cards[j][i].setPlayable(true);
+			}
+			
 		}
 		repaint();
 		//this.addMouseListener(this);/**/
@@ -159,16 +227,21 @@ class CardPanel extends JPanel implements MouseListener
 	private void shuffleCards()
 	{
 		Random rand = new Random();
-		for(int i = 0; i < cards.length; i++)
+		for(int row = 0; row < cards.length; row++)
 		{
-			int randomIndex = rand.nextInt(cards.length);
-			//System.out.println(randomIndex);
-			//set temporary storage for current card
-			Card temp = cards[i];
-			//set current card equal to card at random number
-			cards[i] = cards[randomIndex];
-			//set card at random number equal to temporary stored card
-			cards[randomIndex] = temp;
+			for(int col = 0; col < cards.length; col++)
+			{
+				int i1 = rand.nextInt(cards.length);
+				int i2 = rand.nextInt(cards.length);
+				//System.out.println(randomIndex);
+				//set temporary storage for current card
+				Card temp = cards[col][row];
+				//set current card equal to card at random number
+				cards[col][row] = cards[i1][i2];
+				//set card at random number equal to temporary stored card
+				cards[i1][i2] = temp;
+			}
+			
 		}
 	}
 	
@@ -178,22 +251,26 @@ class CardPanel extends JPanel implements MouseListener
 		super.paintComponent(g);
 		Graphics2D g2D = (Graphics2D)g;
 
-		for(int i = 0; i < cards.length; i++)
+		for(int row = 0; row < cards.length; row++)
 		{
+			for(int col=0; col < cards.length; col++)
+			{
+				//draw the image for card[i] at x, y, width, height
+				g2D.drawImage(cards[row][col].displayImage(),
+						col*200,row*200,200,200,null);
+				//bump each additional card over by 200 px 
+				cards[row][col].setX(col*200);
+				cards[row][col].setY(row*200);
+			}
 
-			//draw the image for card[i] at x, y, width, height
-			g2D.drawImage(cards[i].displayImage(),
-					i*200,0,200,200,null);
-			//bump each additional card over by 200 px 
-			cards[i].setX(i*200);
-			cards[i].setY(0);
+			
 		}
 	}
 	
 	@Override
 	public Dimension getPreferredSize()
 	{
-		return new Dimension(800,200);
+		return new Dimension(800,800);
 
 	}
 
@@ -226,49 +303,64 @@ class CardPanel extends JPanel implements MouseListener
 		Card card2 = null;
 		int numFaceDown = 0;
 		
-		mp.setLabelText(" ");
+		mp.setLabelText("Who's Poo Game");
 		
 		for(int i = 0; i < cards.length; i++)
 		{
-			if(cards[i].contains(e.getX(), e.getY()) 
-					&& cards[i].isPlayable())
+			for(int j = 0; j < cards.length; j++)
 			{
-				//use either strict or toggle mode
-				
-				//strict mode - card only turn face up
-				//cards[i].setFaceUp(true);
-				
-				//toggle mode - card turns face up or down
-				cards[i].setFaceUp(!cards[i].isFaceUp());
-				//System.out.println(cards[i].getMatchId() + " matchId");
+				if(cards[i][j].contains(e.getX(), e.getY()) 
+						&& cards[i][j].isPlayable())
+				{
+					//use either strict or toggle mode
+					
+					//strict mode - card only turn face up
+					cards[i][j].setFaceUp(true);
+					
+					//toggle mode - card turns face up or down
+					//cards[i][j].setFaceUp(!cards[i][j].isFaceUp());
+					//System.out.println(cards[i].getMatchId() + " matchId");
+					//System.out.println(i + "-" + j);
+					//System.out.println(cards[i][j].getX());
+					//System.out.println(cards[i][j].getY());
+				}
 			}
+			
 		}
 		
 		//count cards face up after the mouse is pressed
 		for(int i = 0; i < cards.length; i++)
 		{
-			if(cards[i].isFaceUp() && !cards[i].isMatched())
+			for(int j = 0; j < cards.length; j++)
 			{
-				numFaceUp++;
-				if(numFaceUp==1)
+				if(cards[i][j].isFaceUp() && !cards[i][j].isMatched())
 				{
-					card1 = cards[i];
-				}
-				else if(numFaceUp==2)
-				{
-					card2 = cards[i];
+					numFaceUp++;
+					if(numFaceUp==1)
+					{
+						card1 = cards[i][j];
+					}
+					else if(numFaceUp==2)
+					{
+						card2 = cards[i][j];
+					}
 				}
 			}
+			
 			
 		}
 		
 		//count number of cards face down after mouse is pressed
 		for(int i = 0; i < cards.length; i++)
 		{
-			if(!cards[i].isFaceUp())
+			for(int j = 0; j < cards.length; j++)
 			{
-				numFaceDown++;
+				if(!cards[i][j].isFaceUp())
+				{
+					numFaceDown++;
+				}
 			}
+			
 		}
 		//System.out.println(numFaceUp + " number of cards face up");
 		//System.out.println(card1 + " card1");
@@ -305,21 +397,25 @@ class CardPanel extends JPanel implements MouseListener
 		//are already face up and a third one is selected
 		if(numFaceUp>2)
 		{
-			System.out.println("Too many cards flipped");
+			//System.out.println("Too many cards flipped");
 			for(int i = 0; i < cards.length; i++)
 			{
-				if(cards[i].isPlayable())
+				for(int j = 0; j < cards.length; j++)
 				{
-					cards[i].setFaceUp(false);
+					if(cards[i][j].isPlayable())
+				{
+					cards[i][j].setFaceUp(false);
 				}
+				}
+				
 			}
 		}
 		
 		// if all the cards are face up, you win
-		System.out.println(numFaceDown);
+		//System.out.println(numFaceDown);
 		if(numFaceDown == 0)
 		{
-			mp.setLabelText("Winner Winner Chicken Dinner!");
+			mp.setLabelText("Winner! Click reset to play again.");
 		}
 
 		repaint();
@@ -354,7 +450,7 @@ class Card
 	//defaults
 	public Card()
 	{
-		faceUpImage = new ImageIcon("1.jpg").getImage();
+		faceUpImage = new ImageIcon("1.png").getImage();
 		faceDownImage = new ImageIcon("back.png").getImage();
 		isFaceUp = false;
 		isDealt = false;
@@ -368,7 +464,7 @@ class Card
 	{
 		x = 0;
 		y = 0;
-		faceUpImage = new ImageIcon(imgName + ".jpg").getImage();
+		faceUpImage = new ImageIcon(imgName + ".png").getImage();
 		faceDownImage = new ImageIcon("back.png").getImage();
 		// show random order of cards facing up
 		// switch to isFaceUp = false later
